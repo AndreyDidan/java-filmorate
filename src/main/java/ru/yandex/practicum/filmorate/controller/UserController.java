@@ -36,7 +36,7 @@ public class UserController {
 
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.error("email == null or email not found @");
-            throw new ValidationException("Имайл не должен быть пусты и должен иметь символ '@'");
+            throw new ValidationException("Имайл не должен быть пустым и должен иметь символ '@'");
         } else {
             newUser.setEmail(user.getEmail());
         }

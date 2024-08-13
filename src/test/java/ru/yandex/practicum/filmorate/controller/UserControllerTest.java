@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -55,7 +54,7 @@ class UserControllerTest {
         user.setBirthday(LocalDate.of(1992, 10, 25));
         userController.create(user);
 
-        Assertions.assertEquals("andrey92", user.getName());
+        assertEquals("andrey92", user.getName());
     }
 
     @Test
@@ -65,11 +64,14 @@ class UserControllerTest {
         user.setLogin("andrey92");
         user.setBirthday(LocalDate.of(1992, 10, 25));
 
-        try {
-            userController.create(user);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Имайл не должен быть пусты и должен иметь символ '@'", e.getMessage());
-        }
+        Throwable exception = assertThrows(
+                ValidationException.class,
+                () -> {
+                    userController.create(user);
+                }
+        );
+
+        assertEquals("Имайл не должен быть пустым и должен иметь символ '@'", exception.getMessage());
     }
 
     @Test
@@ -78,11 +80,14 @@ class UserControllerTest {
         user.setEmail("andrey@mail.ru");
         user.setBirthday(LocalDate.of(1992, 10, 25));
 
-        try {
-            userController.create(user);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Логин не должен быть пустым и содержать пробелы", e.getMessage());
-        }
+        Throwable exception = assertThrows(
+                ValidationException.class,
+                () -> {
+                    userController.create(user);
+                }
+        );
+
+        assertEquals("Логин не должен быть пустым и содержать пробелы", exception.getMessage());
     }
 
     @Test
@@ -92,11 +97,14 @@ class UserControllerTest {
         user.setLogin("dfd dgfdg");
         user.setBirthday(LocalDate.of(1992, 10, 25));
 
-        try {
-            userController.create(user);
-        } catch (ValidationException e) {
-            Assertions.assertEquals("Логин не должен быть пустым и содержать пробелы", e.getMessage());
-        }
+        Throwable exception = assertThrows(
+                ValidationException.class,
+                () -> {
+                    userController.create(user);
+                }
+        );
+
+        assertEquals("Логин не должен быть пустым и содержать пробелы", exception.getMessage());
     }
 
     @Test
@@ -106,11 +114,14 @@ class UserControllerTest {
         user.setLogin("andrey92");
         user.setBirthday(LocalDate.of(2025, 10, 25));
 
-        try {
-            userController.create(user);
-        } catch (ValidationException exp) {
-            Assertions.assertEquals("День рождения не может быть в будущем", exp.getMessage());
-        }
+        Throwable exception = assertThrows(
+                ValidationException.class,
+                () -> {
+                    userController.create(user);
+                }
+        );
+
+        assertEquals("День рождения не может быть в будущем", exception.getMessage());
     }
 
     @Test
@@ -121,11 +132,20 @@ class UserControllerTest {
         user.setBirthday(LocalDate.of(1992, 10, 25));
         userController.create(user);
 
-        try {
-            userController.update(new User(4L, "andrey@mail.ru", "andrey92", "Андрей",
-                    LocalDate.of(1992, 10, 25)));
-        } catch (NotFoundException e) {
-            Assertions.assertEquals("Пользователь с id = 4 не найден", e.getMessage());
-        }
+        User user1 = new User();
+        user1.setId(4L);
+        user1.setEmail("andrey@mail.ru");
+        user1.setLogin("andrey92");
+        user1.setName("Андрей");
+        user1.setBirthday(LocalDate.of(1992, 10, 25));
+
+        Throwable exception = assertThrows(
+                NotFoundException.class,
+                () -> {
+                    userController.update(user1);
+                }
+        );
+
+        assertEquals("Пользователь с id = 4 не найден", exception.getMessage());
     }
 }

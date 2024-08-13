@@ -18,6 +18,9 @@ import java.util.Map;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
+
+    public static final LocalDate DATA_RELISE = LocalDate.of(1895, 12, 28);
+
     private final Map<Long, Film> films = new HashMap<>();
 
     @GetMapping
@@ -34,17 +37,19 @@ public class FilmController {
             log.error("name == null");
             throw new ValidationException("Не добавлено название фильма");
         }
-        if (film.getDescription().length() > 200) {
-            log.error("Description.length > 200");
-            throw new ValidationException("Длинна описания более 200 символов");
+        if (film.getDescription().length() > 201 || film.getDescription() == null) {
+            log.error("Description.length > 200 or == null");
+            throw new ValidationException("Длинна описания более 200 символов или отсутствует");
         }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.error("releaseDate.isBefore(1895.12.28)");
-            throw new ValidationException("Дата релиза не может быть старше 28.12.1895");
+        if (film.getReleaseDate().isBefore(DATA_RELISE)
+                || film.getDuration() == null) {
+            log.error("releaseDate.isBefore(1895.12.28) or == null");
+            throw new ValidationException("Дата релиза не может быть старше 28.12.1895 и не может быть пустой");
         }
-        if (film.getDuration().isZero() || film.getDuration().isNegative()) {
-            log.error("duration <= 0");
-            throw new ValidationException("Продолжительность фильма не может быть равна или меньше 0");
+        if (film.getDuration() == null || film.getDuration() < 1) {
+            log.error("duration <= 0 or == null");
+            throw new ValidationException("Продолжительность фильма не может быть равна или меньше 0, а также " +
+                    "отсутствовать");
         }
 
         film.setId(getNextId());
@@ -69,14 +74,13 @@ public class FilmController {
             if (newFilm.getName() != null && !newFilm.getName().isBlank()) {
                 oldFilm.setName(newFilm.getName());
             }
-            if (newFilm.getDescription() != null && newFilm.getDescription().length() < 200) {
+            if (newFilm.getDescription() != null && newFilm.getDescription().length() < 201) {
                 oldFilm.setDescription(newFilm.getDescription());
             }
-            if (newFilm.getReleaseDate() != null && newFilm.getReleaseDate().isAfter(LocalDate.of(1895, 12,
-                    28))) {
+            if (newFilm.getReleaseDate() != null && newFilm.getReleaseDate().isAfter(DATA_RELISE)) {
                 oldFilm.setReleaseDate(newFilm.getReleaseDate());
             }
-            if (newFilm.getDuration() != null && newFilm.getDuration().isPositive()) {
+            if (newFilm.getDuration() != null && newFilm.getDuration() > 0) {
                 oldFilm.setDuration(newFilm.getDuration());
             }
             log.info("Фильм обновлен {}", oldFilm);

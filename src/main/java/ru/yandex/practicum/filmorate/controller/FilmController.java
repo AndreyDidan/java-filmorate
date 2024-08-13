@@ -19,7 +19,7 @@ import java.util.Map;
 @Slf4j
 public class FilmController {
 
-    private final LocalDate DATA_RELISE = LocalDate.of(1895, 12, 28);
+    private static final LocalDate DATA_RELISE = LocalDate.of(1895, 12, 28);
 
     private final Map<Long, Film> films = new HashMap<>();
 

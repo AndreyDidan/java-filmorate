@@ -5,8 +5,13 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
@@ -14,22 +19,24 @@ class UserControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        userController = new UserController();
+        UserStorage userStorage = new InMemoryUserStorage();
+        UserService userService = new UserService(userStorage);
+        userController = new UserController(userService);
     }
 
     @Test
     void createUser() {
         User user = userController.create(new User(1L, "andrey@mail.ru", "andrey92", "Андрей",
-                LocalDate.of(1992, 10, 25)));
+                LocalDate.of(1992, 10, 25), Collections.emptySet()));
         assertEquals("Андрей", user.getName());
     }
 
     @Test
     void getUsers() {
         User user = userController.create(new User(1L, "andrey@mail.ru", "andrey92", "Андрей",
-                LocalDate.of(1992, 10, 25)));
+                LocalDate.of(1992, 10, 25), Collections.emptySet()));
         User user1 = userController.create(new User(2L, "klen@mail.ru", "andrey2", "Андреевич",
-                LocalDate.of(1991, 11, 26)));
+                LocalDate.of(1991, 11, 26), Collections.emptySet()));
 
         assertEquals(2, userController.findAll().size());
         assertEquals("andrey2", user1.getLogin());
@@ -38,9 +45,9 @@ class UserControllerTest {
     @Test
     void updateUser() {
         User user = userController.create(new User(1L, "andrey@mail.ru", "andrey92", "Андрей",
-                LocalDate.of(1992, 10, 25)));
+                LocalDate.of(1992, 10, 25), Collections.emptySet()));
         User newUser = userController.update(new User(1L, "andrey@mail.ru", "andrey9", "Андрей",
-                LocalDate.of(1992, 10, 25)));
+                LocalDate.of(1992, 10, 25), Collections.emptySet()));
 
         assertEquals("Андрей", newUser.getName());
         assertEquals(1, userController.findAll().size());

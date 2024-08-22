@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
@@ -42,9 +41,9 @@ public class FilmControllerTest {
     @Test
     void getFilms() {
         Film film = filmController.create(new Film(1L, "Woolf!", "Big bad woolf",
-                LocalDate.of(2022, 7, 4), 90, Collections.emptySet());
+                LocalDate.of(2022, 7, 4), 90, Collections.emptySet()));
         Film film1 = filmController.create(new Film(2L, "Cat!", "Very bad cat",
-                LocalDate.of(2022, 11, 1), 90, Collections.emptySet());
+                LocalDate.of(2022, 11, 1), 90, Collections.emptySet()));
 
         assertEquals(2, filmController.findAll().size());
         assertEquals("Very bad cat", film1.getDescription());

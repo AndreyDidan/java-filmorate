@@ -46,31 +46,24 @@ public class FilmService {
     }
 
     public Film addLike(Long filmId, Long userId) {
-        Film film = filmStorage.getFilm(filmId);
+        Film film = getFilm(filmId);
         User user = userStorage.getUser(userId);
-
         Set<Long> likes = film.getLikes();
-        if (likes == null) {
-            likes = new HashSet<>();
-        }
         likes.add(user.getId());
-        film.setLikes(likes);
         log.info("Пользователь id={} добавил лайк фильму id={}", userId, filmId);
         return film;
     }
 
     public Film deleteLike(Long filmId, Long userId) {
-        Film film = filmStorage.getFilm(filmId);
+        Film film = getFilm(filmId);
         User user = userStorage.getUser(userId);
         Set<Long> likes = film.getLikes();
         if (!film.getLikes().contains(userId)) {
             log.warn("Пользователь id={} не ставил лайк выбранному фильму id={}", userId, filmId);
             throw new NotFoundException("Пользователь" + userId + "не ставил лайк выбранному фильму");
-        } else {
-            likes.remove(user.getId());
-            film.setLikes(likes);
-            log.info("Пользователь id={} удалил лайк у фильма id={}", userId, filmId);
-            return film;
         }
+        likes.remove(user.getId());
+        log.info("Пользователь id={} удалил лайк у фильма id={}", userId, filmId);
+        return film;
     }
 }

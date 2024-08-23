@@ -28,7 +28,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("name == null");
             throw new ValidationException("Не добавлено название фильма");
         }
-        if (film.getDescription().length() > 201 || film.getDescription() == null) {
+        if (film.getDescription().length() > 200 || film.getDescription() == null) {
             log.error("Description.length > 200 or == null");
             throw new ValidationException("Длинна описания более 200 символов или отсутствует");
         }
@@ -47,11 +47,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.put(film.getId(), film);
         log.info("Фильм создан {}", film);
         return film;
-    }
-
-    @Override
-    public Film findFilmById(Long id) {
-        return null;
     }
 
     @Override

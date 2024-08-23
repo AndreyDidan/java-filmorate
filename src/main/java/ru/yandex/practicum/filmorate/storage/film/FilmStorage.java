@@ -11,9 +11,6 @@ public interface FilmStorage {
     //Создание фидьма
     Film createFilm(Film film);
 
-    //Нахождение по id
-    Film findFilmById(Long id);
-
     //Обновление фильма
     Film updateFilm(Film newFilm);
 

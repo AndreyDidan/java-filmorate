@@ -5,11 +5,17 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
+import java.util.Collections;
 
 public class FilmControllerTest {
 
@@ -17,13 +23,16 @@ public class FilmControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        filmController = new FilmController();
+        FilmStorage filmStorage = new InMemoryFilmStorage();
+        UserStorage userStorage = new InMemoryUserStorage();
+        FilmService filmService = new FilmService(filmStorage, userStorage);
+        filmController = new FilmController(filmService);
     }
 
     @Test
     void createFilm() {
         Film film = filmController.create(new Film(1L, "Woolf!", "Big bad woolf",
-                LocalDate.of(2022, 7, 4), 90));
+                LocalDate.of(2022, 7, 4), 90, Collections.emptySet()));
 
         assertEquals("Woolf!", film.getName());
         assertEquals(1, filmController.findAll().size());
@@ -32,9 +41,9 @@ public class FilmControllerTest {
     @Test
     void getFilms() {
         Film film = filmController.create(new Film(1L, "Woolf!", "Big bad woolf",
-                LocalDate.of(2022, 7, 4), 90));
+                LocalDate.of(2022, 7, 4), 90, Collections.emptySet()));
         Film film1 = filmController.create(new Film(2L, "Cat!", "Very bad cat",
-                LocalDate.of(2022, 11, 1), 90));
+                LocalDate.of(2022, 11, 1), 90, Collections.emptySet()));
 
         assertEquals(2, filmController.findAll().size());
         assertEquals("Very bad cat", film1.getDescription());
@@ -43,9 +52,9 @@ public class FilmControllerTest {
     @Test
     void updateFilm() {
         filmController.create(new Film(1L, "Woolf!", "Big bad woolf",
-                LocalDate.of(2022, 7, 4), 90));
+                LocalDate.of(2022, 7, 4), 90, Collections.emptySet()));
         Film newFilm = filmController.update(new Film(1L, "Bad WoolF!!!", "Very bad woolf",
-                LocalDate.of(2021, 6, 3), 80));
+                LocalDate.of(2021, 6, 3), 80, Collections.emptySet()));
 
         assertEquals("Bad WoolF!!!", newFilm.getName());
         assertEquals(1, filmController.findAll().size());

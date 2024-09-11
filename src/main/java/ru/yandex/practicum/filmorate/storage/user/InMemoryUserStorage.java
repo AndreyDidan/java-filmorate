@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -103,11 +104,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getUser(Long id) {
-        if (users.containsKey(id)) {
-            return users.get(id);
-        } else {
-            throw new NotFoundException("Пользователь с id = " + id + " не найден");
-        }
+        return Optional.ofNullable(users.get(id)).orElseThrow(() -> new NotFoundException("Пользователь с id = " + id +
+                " не найден"));
     }
 
     // вспомогательный метод для генерации идентификатора

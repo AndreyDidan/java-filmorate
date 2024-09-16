@@ -102,9 +102,16 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUser(Long id) {
-        return Optional.ofNullable(users.get(id)).orElseThrow(() -> new NotFoundException("Пользователь с id = " + id +
-                " не найден"));
+    public Optional<User> getUser(Long id) {
+        User user = users.get(id);
+
+        if (user == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(user);
+        /*return Optional.ofNullable(users.get(id)).orElseThrow(() -> new NotFoundException("Пользователь с id = " + id +
+                " не найден"));*/
     }
 
     // вспомогательный метод для генерации идентификатора

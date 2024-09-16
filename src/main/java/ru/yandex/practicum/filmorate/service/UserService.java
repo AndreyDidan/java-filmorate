@@ -3,10 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +31,15 @@ public class UserService {
     }
 
     public User getUser(Long id) {
-        return userStorage.getUser(id);
+        Optional<User> user = userStorage.getUser(id);
+        if (user.isEmpty()) {
+            log.error("Пользователь с id {} не найден", id);
+            throw new NotFoundException(String.format("Пользователь с id {} не найден", id));
+        }
+        return user.get();
+
+
+        //return userStorage.getUser(id);
     }
 
     public User addFriend(Long userId, Long friendId) {

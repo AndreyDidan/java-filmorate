@@ -16,7 +16,7 @@ import java.util.*;
 @Slf4j
 public class FilmService {
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final UserService userService;
 
     public Collection<Film> getAllFilms() {
         return filmStorage.getAllFilms();
@@ -31,7 +31,14 @@ public class FilmService {
     }
 
     public Film getFilm(Long id) {
-        return filmStorage.getFilm(id);
+        Optional<Film> film = filmStorage.getFilm(id);
+        if (film.isEmpty()) {
+            log.error("Фильм с id {} не найден", id);
+            throw new NotFoundException(String.format("Фильм с id {} не найден", id));
+        }
+        return film.get();
+
+        //return filmStorage.getFilm(id);
     }
 
     public Collection<Film> getPopularFilms(Long count) {
@@ -47,7 +54,7 @@ public class FilmService {
 
     public Film addLike(Long filmId, Long userId) {
         Film film = getFilm(filmId);
-        User user = userStorage.getUser(userId);
+        User user = userService.getUser(userId);
         Set<Long> likes = film.getLikes();
         likes.add(user.getId());
         log.info("Пользователь id={} добавил лайк фильму id={}", userId, filmId);
@@ -56,7 +63,7 @@ public class FilmService {
 
     public Film deleteLike(Long filmId, Long userId) {
         Film film = getFilm(filmId);
-        User user = userStorage.getUser(userId);
+        User user = userService.getUser(userId);
         Set<Long> likes = film.getLikes();
         if (!film.getLikes().contains(userId)) {
             log.warn("Пользователь id={} не ставил лайк выбранному фильму id={}", userId, filmId);

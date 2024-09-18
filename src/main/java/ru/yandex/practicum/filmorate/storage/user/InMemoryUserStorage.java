@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.user;
+/*package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -112,10 +112,10 @@ public class InMemoryUserStorage implements UserStorage {
         return Optional.of(user);
         /*return Optional.ofNullable(users.get(id)).orElseThrow(() -> new NotFoundException("Пользователь с id = " + id +
                 " не найден"));*/
-    }
+    //}
 
     // вспомогательный метод для генерации идентификатора
-    private long getNextId() {
+    /*private long getNextId() {
         long currentMaxId = users.keySet()
                 .stream()
                 .mapToLong(id -> id)
@@ -136,4 +136,4 @@ public class InMemoryUserStorage implements UserStorage {
         }
         return isLogin;
     }
-}
+}*/

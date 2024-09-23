@@ -180,8 +180,8 @@ class FilmorateApplicationTests {
 
 		userService.addFriend(firstUser.getId(), secondUser.getId());
 		Assertions.assertNotNull(userService.getAllFriends(firstUser.getId()));
-		Assertions.assertEquals(friends ,userService.getAllFriends(firstUser.getId()));
-		Assertions.assertEquals(friend ,userService.getAllFriends(secondUser.getId()));
+		Assertions.assertEquals(friends, userService.getAllFriends(firstUser.getId()));
+		Assertions.assertEquals(friend, userService.getAllFriends(secondUser.getId()));
 	}
 
 	@Test

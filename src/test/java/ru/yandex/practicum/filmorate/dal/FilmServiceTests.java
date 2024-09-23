@@ -67,7 +67,7 @@ class FilmServiceTests {
     @Test
     void testCreateFilm() {
         Film film = filmService.createFilm(firstFilm);
-        Assertions.assertEquals(film ,firstFilm);
+        Assertions.assertEquals(film, firstFilm);
     }
 
     @Test

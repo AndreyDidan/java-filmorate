@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -20,7 +19,7 @@ public class UserService {
 
     private final UserStorage userStorage;
 
-    public UserService(@Qualifier("userSrorage") UserStorage userStorage) {
+    public UserService(@Qualifier("userStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -69,42 +68,37 @@ public class UserService {
             throw new ValidationException("Id должен быть указан");
         }
 
-
         User oldUser = newUser;
 
-        if (isId(oldUser)) {
-            if (newUser.getEmail() != null && newUser.getEmail().contains("@")) {
-                oldUser.setEmail(newUser.getEmail());
-            } else {
-                log.error("email == null or email not found @");
-                throw new ValidationException("Имайл не должен быть пусты и должен иметь символ '@'");
-            }
-            if (newUser.getLogin() != null && !newUser.getLogin().contains(" ")) {
-                if (isLogin(newUser)) {
-                    log.error("login == login another user");
-                    throw new DuplicatedDataException("Этот логин уже используется");
-                } else {
-                    oldUser.setLogin(newUser.getLogin());
-                }
-            } else {
-                log.error("login == null or equals ' '");
-                throw new ValidationException("Логин не должен быть пустым и содержать пробелы");
-            }
-            if (newUser.getName() != null) {
-                oldUser.setName(newUser.getName());
-            }
-            if (newUser.getBirthday() != null && !newUser.getBirthday().isAfter(LocalDate.now())) {
-                oldUser.setBirthday(newUser.getBirthday());
-            } else {
-                log.error("birthday.isAfter now");
-                throw new ValidationException("День рождения не может быть в будущем");
-            }
-            userStorage.updateUser(oldUser);
-            return oldUser;
+        checkId(newUser.getId());
+        if (newUser.getEmail() != null && newUser.getEmail().contains("@")) {
+            oldUser.setEmail(newUser.getEmail());
         } else {
-            log.error("id user not contains users");
-            throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
+            log.error("email == null or email not found @");
+            throw new ValidationException("Имайл не должен быть пусты и должен иметь символ '@'");
         }
+        if (newUser.getLogin() != null && !newUser.getLogin().contains(" ")) {
+            if (isLogin(newUser)) {
+                log.error("login == login another user");
+                throw new DuplicatedDataException("Этот логин уже используется");
+            } else {
+                oldUser.setLogin(newUser.getLogin());
+            }
+        } else {
+            log.error("login == null or equals ' '");
+            throw new ValidationException("Логин не должен быть пустым и содержать пробелы");
+        }
+        if (newUser.getName() != null) {
+            oldUser.setName(newUser.getName());
+        }
+        if (newUser.getBirthday() != null && !newUser.getBirthday().isAfter(LocalDate.now())) {
+            oldUser.setBirthday(newUser.getBirthday());
+        } else {
+            log.error("birthday.isAfter now");
+            throw new ValidationException("День рождения не может быть в будущем");
+        }
+        userStorage.updateUser(oldUser);
+        return oldUser;
     }
 
     public User getUser(Long id) {
@@ -117,38 +111,39 @@ public class UserService {
     }
 
     public User addFriend(Long userId, Long friendId) {
-        User user = getUser(userId);
-        User friend = getUser(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
-        log.info("Пользователь id={} добавлен в друзья к пользователю id={}", user, friend);
-        return user;
+        User user = userStorage.getUser(userId).orElseThrow(() -> new NotFoundException("Пользователей с id "
+                + userId + " нет"));
+        User friend = userStorage.getUser(friendId).orElseThrow(() -> new NotFoundException("Пользователей с id "
+                + friendId + " нет"));
+        if (user.getFriends().contains(friend)) {
+            log.error("Пользователь с id {} уже добавлен", friendId);
+            throw new ValidationException(String.format("Пользователь с id {} уже добавлен", friendId));
+        }
+
+            userStorage.addFriend(userId, friendId);
+            log.info("Пользователь с id={} добавил в друзья пользователя с id={}", userId, friendId);
+            return user;
     }
 
-    public User deleteFriend(Long userId, Long friendId) {
-        User user = getUser(userId);
-        User friend = getUser(friendId);
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
-        log.info("Пользователь id={} удалён из друзей пользователя id={}", user, friend);
-        return user;
+    public void deleteFriend(Long userId, Long friendId) {
+        checkId(userId);
+        checkId(friendId);
+        if (friendReciprocity(friendId, userId)) {
+            userStorage.deleteFriend(userId, friendId);
+        }
+        log.info("Пользователь с id {} удалил из друзей пользователя с id {}", userId, friendId);
     }
 
     public Collection<User> getAllFriends(Long userId) {
-        User user = getUser(userId);
-        log.info("Получение всех друзей пользователя id={}", userId);
-        return user.getFriends().stream()
-                .map(this::getUser)
-                .collect(Collectors.toList());
+        if (getUser(userId) == null) {
+            log.error("Пользователь с id = " + userId + " не найден");
+            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
+        }
+        return userStorage.getAllFriends(userId);
     }
 
     public Collection<User> getCommonFriends(Long userId, Long otherId) {
-        User user = getUser(userId);
-        User otherUser = getUser(otherId);
-        return user.getFriends().stream()
-                .filter(otherUser.getFriends()::contains)
-                .map(this::getUser)
-                .collect(Collectors.toList());
+        return userStorage.getCommonFriends(userId, otherId);
     }
 
     private boolean isLogin(User user) {
@@ -163,15 +158,14 @@ public class UserService {
         return isLogin;
     }
 
-    private boolean isId(User user) {
-        boolean isId = false;
-        Collection<User> allUsers = getAllUsers();
-        for (User allUser : allUsers) {
-            if (allUser.getId().equals(user.getId())) {
-                isId = true;
-                break;
-            }
+    public void checkId(Long id) {
+        if (userStorage.getUser(id).isEmpty()) {
+            log.warn("Пользователь с ID {} не найден", id);
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
-        return isId;
+    }
+
+    public boolean friendReciprocity(Long id, Long friendId) {
+        return userStorage.getAllFriends(friendId).stream().anyMatch(user -> user.getId() == id);
     }
 }

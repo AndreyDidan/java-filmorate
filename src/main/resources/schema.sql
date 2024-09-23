@@ -10,17 +10,17 @@ CREATE TABLE IF NOT EXISTS friends (
     friend_id INTEGER PRIMARY KEY AUTO_INCREMENT,
     user_id LONG REFERENCES users(user_id),
     friends_id LONG REFERENCES users(user_id),
-    status BOOLEAN NOT NULL
+    status BOOLEAN DEFAULT FALSE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS mpa (
     mpa_id INTEGER PRIMARY KEY,
-    limitations VARCHAR(80) UNIQUE
+    name VARCHAR(80) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS genre (
     genre_id INTEGER PRIMARY KEY,
-    genre VARCHAR NOT NULL UNIQUE
+    name VARCHAR NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS films (
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS films (
     name VARCHAR NOT NULL,
     mpa_id INTEGER REFERENCES mpa(mpa_id),
     description VARCHAR(200) NOT NULL,
-    release_date DATE NOT NULL,
+    releaseDate DATE NOT NULL,
     duration INTEGER NOT NULL
 );
 

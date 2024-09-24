@@ -2,11 +2,10 @@ package ru.yandex.practicum.filmorate.dal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import ru.yandex.practicum.filmorate.exception.InternalServerException;
+import ru.yandex.practicum.filmorate.exception.DatabaseUpdateException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
@@ -21,10 +20,10 @@ public class BaseRepository<T> {
     protected final RowMapper<T> mapper;
 
     protected Optional<T> findOne(String query, Object... params) {
-        try {
-            T result = jdbcTemplate.queryForObject(query, mapper, params);
-            return Optional.ofNullable(result);
-        } catch (EmptyResultDataAccessException ignored) {
+        List<T> results = jdbcTemplate.query(query, mapper, params);
+        if (results != null && !results.isEmpty()) {
+            return Optional.of(results.get(0));
+        } else {
             return Optional.empty();
         }
     }
@@ -37,7 +36,7 @@ public class BaseRepository<T> {
         int rowsUpdated = jdbcTemplate.update(query, params);
         if (rowsUpdated == 0) {
             log.error("Ошибка при обновлении данных");
-            throw new InternalServerException("Ошибка при обновлении данных");
+            throw new DatabaseUpdateException("Ошибка при обновлении данных");
         }
     }
 
@@ -61,7 +60,17 @@ public class BaseRepository<T> {
             return id;
         } else {
             log.error("Ошибка при сохранении данных");
-            throw new InternalServerException("Ошибка при сохранении данных");
+            throw new DatabaseUpdateException("Ошибка при сохранении данных");
+        }
+    }
+
+    protected void batchUpdate(String query, List<Object[]> batchArgs) {
+        int[] updatedRows = jdbcTemplate.batchUpdate(query, batchArgs);
+        for (int rows : updatedRows) {
+            if (rows == 0) {
+                log.error("Ошибка при обновлении данных");
+                throw new DatabaseUpdateException("Ошибка при обновлении данных");
+            }
         }
     }
 
@@ -80,7 +89,7 @@ public class BaseRepository<T> {
             return id;
         } else {
             log.error("Ошибка при сохранении данных");
-            throw new InternalServerException("Ошибка при сохранении данных");
+            throw new DatabaseUpdateException("Ошибка при сохранении данных");
         }
     }
 }

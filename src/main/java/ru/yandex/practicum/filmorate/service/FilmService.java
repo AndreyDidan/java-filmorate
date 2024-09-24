@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -76,13 +77,6 @@ public class FilmService {
         }
 
         filmStorage.createFilm(film);
-
-        if (film.getGenres() != null) {
-            List<Genre> genres = film.getGenres();
-            for (Genre genre : genres) {
-                filmStorage.addGenreToFilm(film.getId(), genre.getId());
-            }
-        }
         log.info("Фильм создан {}", film);
         return film;
     }
@@ -119,14 +113,6 @@ public class FilmService {
                 newFilm.setGenres(new ArrayList<>());
             } else {
                 validateGenres(newFilm);
-            }
-
-            filmStorage.deleteAllGenreToFilm(newFilm.getId());
-            if (newFilm.getGenres() != null) {
-                List<Genre> genres = newFilm.getGenres();
-                for (Genre genre : genres) {
-                    filmStorage.addGenreToFilm(newFilm.getId(), genre.getId());
-                }
             }
 
             filmStorage.updateFilm(newFilm);
@@ -197,9 +183,13 @@ public class FilmService {
     }
 
     private void validateGenres(Film film) {
-        for (Genre genre : film.getGenres()) {
-            if (genre == null || !isGenreExists(genre.getId())) {
-                String errorMessage = genre == null ? "Жанр не может быть null" : "Жанр с ID " + genre.getId() + " не существует";
+        List<Integer> genreIds = film.getGenres().stream()
+                .map(Genre::getId)
+                .collect(Collectors.toList());
+
+        for (Integer genreId : genreIds) {
+            if (!isGenreExists(genreId)) {
+                String errorMessage = "Жанр с ID " + genreId + " не существует";
                 log.error(errorMessage);
                 throw new ValidationException(errorMessage);
             }

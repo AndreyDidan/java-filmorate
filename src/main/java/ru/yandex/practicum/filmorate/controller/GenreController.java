@@ -15,17 +15,17 @@ import java.util.Collection;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/genres")
-public class GenrreController {
+public class GenreController {
 
     private final GenreService genreService;
 
     @GetMapping
-    public Collection<Genre> getAllMpa() {
+    public Collection<Genre> getAllGenre() {
         return genreService.getAllGenre();
     }
 
     @GetMapping("/{id}")
-    public Genre getMpaById(@PathVariable int id) {
+    public Genre getGenreId(@PathVariable int id) {
         return genreService.getGenre(id);
     }
 }

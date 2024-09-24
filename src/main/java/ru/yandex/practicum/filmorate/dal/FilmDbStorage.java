@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -92,13 +93,12 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         );
         film.setId(id);
 
+        List<Object[]> batchArgs = new ArrayList<>();
         for (Genre genre : film.getGenres()) {
-            update(
-                    INSERT_GENRE_FILM_QUERY,
-                    film.getId(),
-                    genre.getId()
-            );
+            batchArgs.add(new Object[]{film.getId(), genre.getId()});
         }
+
+        batchUpdate(INSERT_GENRE_FILM_QUERY, batchArgs);
 
         return film;
     }
@@ -108,28 +108,34 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         delete(DELETE_GENRE_TO_FILM_QUERY, filmId);
     }
 
-    @Override
     public Film updateFilm(Film newFilm) {
-        update(UPDATE_FILM_QUERY, newFilm.getName(), newFilm.getDescription(),
-                newFilm.getReleaseDate(), newFilm.getDuration(), newFilm.getMpa().getId(), newFilm.getId());
+        update(UPDATE_FILM_QUERY,
+                newFilm.getName(),
+                newFilm.getDescription(),
+                newFilm.getReleaseDate(),
+                newFilm.getDuration(),
+                newFilm.getMpa().getId(),
+                newFilm.getId());
+
         deleteAllGenreToFilm(newFilm.getId());
+
+        List<Object[]> batchArgs = new ArrayList<>();
         for (Genre genre : newFilm.getGenres()) {
-            update(
-                    INSERT_GENRE_FILM_QUERY,
-                    newFilm.getId(),
-                    genre.getId()
-            );
+            batchArgs.add(new Object[]{newFilm.getId(), genre.getId()});
         }
+
+        batchUpdate(INSERT_GENRE_FILM_QUERY, batchArgs);
+
         return newFilm;
     }
 
     @Override
     public Optional<Film> getFilm(Long id) {
-        try {
-            List<Film> result = jdbcTemplate.query(GET_FILM_QUERY, filmExtractor, id);
-            return result.stream().findFirst();
-        } catch (EmptyResultDataAccessException ignored) {
+        List<Film> result = jdbcTemplate.query(GET_FILM_QUERY, filmExtractor, id);
+        if (result.isEmpty()) {
             return Optional.empty();
+        } else {
+            return Optional.of(result.get(0));
         }
     }
 

@@ -21,8 +21,8 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     private static final String UPDATE_USER_QUERY = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? " +
             "WHERE user_id = ?";
     private static final String INSERT_FRIEND_QUERY = "INSERT INTO friends (user_id, friends_id, status) " +
-            "VALUES (?, ?, true)";
-    private static final String UPDATE_FRIEND_QUERY = "INSERT friends SET user_id = ?, friends_id = ?, status = true " +
+            "VALUES (?, ?, false)";
+    private static final String UPDATE_FRIEND_QUERY = "UPDATE friends SET user_id = ?, friends_id = ?, status = true " +
             "WHERE user_id = ? AND friends_id = ?";
     private static final String UPDATE_FRIEND_QUERY_WHEN_DELETE = "UPDATE friends SET status = false " +
             "WHERE user_id = ? AND friend_id = ?";
@@ -78,7 +78,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     @Override
     public void addFriend(Long userId, Long friendId) {
 
-        if (getAllFriends(friendId).contains(userId)) {
+        if (getAllFriends(userId).contains(friendId)) {
             update(UPDATE_FRIEND_QUERY, userId, friendId);
         } else {
             update(INSERT_FRIEND_QUERY, userId, friendId);

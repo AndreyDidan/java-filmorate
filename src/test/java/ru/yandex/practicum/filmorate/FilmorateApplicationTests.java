@@ -1,4 +1,5 @@
 package ru.yandex.practicum.filmorate;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,6 @@ import ru.yandex.practicum.filmorate.dal.mappers.FilmExtractor;
 import ru.yandex.practicum.filmorate.dal.mappers.GenreRowMapper;
 import ru.yandex.practicum.filmorate.dal.mappers.MpaRowMapper;
 import ru.yandex.practicum.filmorate.dal.mappers.UserRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.UserExtractor;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -33,7 +33,7 @@ import java.util.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @ContextConfiguration(classes = {FilmDbStorage.class, FilmRowMapper.class, FilmExtractor.class, FilmService.class, MpaService.class,
 		MpaDbStorage.class, MpaRowMapper.class, GenreRowMapper.class, GenreService.class, GenreDbStorage.class,
-		UserService.class, UserDbStorage.class, UserExtractor.class, UserRowMapper.class})
+		UserService.class, UserDbStorage.class, UserRowMapper.class})
 class FilmorateApplicationTests {
 
 	private final UserDbStorage userStorage;

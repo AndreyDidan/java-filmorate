@@ -17,7 +17,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -177,18 +176,13 @@ public class FilmService {
         return isId;
     }
 
-    private boolean isGenreExists(int genreId) {
-        Optional<Genre> genre = genreStorage.getGenre(genreId);
-        return genre.isPresent();
-    }
-
     private void validateGenres(Film film) {
-        List<Integer> genreIds = film.getGenres().stream()
-                .map(Genre::getId)
-                .collect(Collectors.toList());
+        Collection<Genre> allGenres = genreStorage.getAllGenre();
+        List<Integer> existingGenreIds = allGenres.stream().map(Genre::getId).toList();
 
-        for (Integer genreId : genreIds) {
-            if (!isGenreExists(genreId)) {
+        List<Integer> filmGenreIds = film.getGenres().stream().map(Genre::getId).toList();
+        for (Integer genreId : filmGenreIds) {
+            if (!existingGenreIds.contains(genreId)) {
                 String errorMessage = "Жанр с ID " + genreId + " не существует";
                 log.error(errorMessage);
                 throw new ValidationException(errorMessage);

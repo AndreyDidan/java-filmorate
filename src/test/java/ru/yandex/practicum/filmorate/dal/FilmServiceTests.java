@@ -1,4 +1,5 @@
 package ru.yandex.practicum.filmorate.dal;
+
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.test.context.ContextConfiguration;
 import ru.yandex.practicum.filmorate.dal.mappers.UserRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.UserExtractor;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @ContextConfiguration(classes = {FilmDbStorage.class, FilmRowMapper.class, FilmExtractor.class, FilmService.class, MpaService.class,
         MpaDbStorage.class, MpaRowMapper.class, GenreRowMapper.class, GenreService.class, GenreDbStorage.class,
-        UserService.class, UserDbStorage.class, UserExtractor.class, UserRowMapper.class})
+        UserService.class, UserDbStorage.class, UserRowMapper.class})
 class FilmServiceTests {
 
     @Autowired

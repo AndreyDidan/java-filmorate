@@ -2,9 +2,9 @@ package ru.yandex.practicum.filmorate.dal;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.dal.mappers.FilmExtractor;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -68,11 +68,9 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
             "ORDER BY count_like DESC";
     private static final String DELETE_GENRE_TO_FILM_QUERY = "DELETE FROM genre_film WHERE film_id = ?";
 
-    private final FilmExtractor filmExtractor;
-
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("filmRowMapper") RowMapper mapper, FilmExtractor filmExtractor) {
-        super(jdbcTemplate, mapper);
-        this.filmExtractor = filmExtractor;
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, @Qualifier("filmRowMapper") RowMapper mapper,
+                         ResultSetExtractor<List<Film>> extractor) {
+        super(jdbcTemplate, mapper, extractor);
     }
 
     @Override
@@ -130,12 +128,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
     @Override
     public Optional<Film> getFilm(Long id) {
-        List<Film> result = jdbcTemplate.query(GET_FILM_QUERY, filmExtractor, id);
-        if (result.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(result.get(0));
-        }
+        return findOneExtr(GET_FILM_QUERY, id);
     }
 
     @Override

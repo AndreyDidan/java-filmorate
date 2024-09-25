@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.dal;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import ru.yandex.practicum.filmorate.exception.DatabaseUpdateException;
@@ -12,20 +12,36 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Slf4j
 public class BaseRepository<T> {
 
     protected final JdbcTemplate jdbcTemplate;
-    protected final RowMapper<T> mapper;
+    protected RowMapper<T> mapper;
+    protected ResultSetExtractor<List<T>> extractor;
+
+    public BaseRepository(JdbcTemplate jdbcTemplate, RowMapper<T> mapper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.mapper = mapper;
+    }
+
+    public BaseRepository(JdbcTemplate jdbcTemplate, RowMapper<T> mapper, ResultSetExtractor<List<T>> extractor) {
+        this.mapper = mapper;
+        this.extractor = extractor;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     protected Optional<T> findOne(String query, Object... params) {
         List<T> results = jdbcTemplate.query(query, mapper, params);
-        if (results != null && !results.isEmpty()) {
+        if (!results.isEmpty()) {
             return Optional.of(results.get(0));
         } else {
             return Optional.empty();
         }
+    }
+
+    protected Optional<T> findOneExtr(String query, Object... params) {
+        List<T> results = jdbcTemplate.query(query, extractor, params);
+        return Optional.ofNullable(results.get(0));
     }
 
     protected List<T> findMany(String query, Object... params) {

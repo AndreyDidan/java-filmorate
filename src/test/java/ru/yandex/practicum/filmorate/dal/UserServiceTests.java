@@ -1,4 +1,5 @@
 package ru.yandex.practicum.filmorate.dal;
+
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.test.context.ContextConfiguration;
 import ru.yandex.practicum.filmorate.dal.mappers.UserRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.UserExtractor;
 import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@ContextConfiguration(classes = {UserDbStorage.class, UserRowMapper.class, UserExtractor.class, UserService.class})
+@ContextConfiguration(classes = {UserDbStorage.class, UserRowMapper.class, UserService.class})
 class UserServiceTests {
     @Autowired
     UserService userService;

@@ -139,6 +139,11 @@ public class FilmService {
     public Film addLike(Long filmId, Long userId) {
         Film film = getFilm(filmId);
         Optional<User> user = userStorage.getUser(userId);
+        //User thisUser = user.get();
+        if (!user.isPresent()) {
+            log.error("Фильм с id {} не найден", userId);
+            throw new NotFoundException(String.format("Фильм с id {} не найден", userId));
+        }
         User thisUser = user.get();
         filmStorage.addLike(film.getId(), thisUser.getId());
         log.info("Пользователь id={} добавил лайк фильму id={}", userId, filmId);

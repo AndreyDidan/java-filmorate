@@ -33,7 +33,7 @@ public class BaseRepository<T> {
     protected Optional<T> findOne(String query, Object... params) {
         List<T> results = jdbcTemplate.query(query, mapper, params);
         if (!results.isEmpty()) {
-            return Optional.of(results.get(0));
+            return Optional.ofNullable(results.get(0));
         } else {
             return Optional.empty();
         }
@@ -41,7 +41,11 @@ public class BaseRepository<T> {
 
     protected Optional<T> findOneExtr(String query, Object... params) {
         List<T> results = jdbcTemplate.query(query, extractor, params);
-        return Optional.ofNullable(results.get(0));
+        if (!results.isEmpty()) {
+            return Optional.ofNullable(results.get(0));
+        } else {
+            return Optional.empty();
+        }
     }
 
     protected List<T> findMany(String query, Object... params) {

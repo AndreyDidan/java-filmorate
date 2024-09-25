@@ -102,7 +102,7 @@ class FilmServiceTests {
 
     @Test
     void testFindFilmByIdNotExist() {
-        assertThrows(NotFoundException.class, () -> filmService.getFilm(99999L));
+        Assertions.assertThrows(NotFoundException.class, () -> filmService.getFilm(555L));
     }
 
     @Test

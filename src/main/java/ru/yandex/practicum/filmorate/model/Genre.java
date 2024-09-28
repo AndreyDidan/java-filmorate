@@ -5,19 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
-public class User {
-    private Long id;
-    private String email;
-    private String login;
+public class Genre {
+    private Integer id;
     private String name;
-    private LocalDate birthday;
-    private Set<Long> friends = new HashSet<>();
 }
